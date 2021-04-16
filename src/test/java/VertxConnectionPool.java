@@ -24,7 +24,7 @@ public class VertxConnectionPool {
 	static void createPoolAndPrepareQuery(Vertx vertx) {
 		JDBCPool pool = JDBCPool.pool(vertx, new JsonObject()
 				.put("driver_class", "org.mariadb.jdbc.Driver")
-				.put("url", "jdbc:mysql://ensembldb.ensembl.org:3306")
+				.put("url", "jdbc:mysql://ensembldb.ensembl.org:3306?autocommit=false")
 				.put("user", "anonymous")
 				.put("password", "")
 				.put("min_pool_size", 1)
