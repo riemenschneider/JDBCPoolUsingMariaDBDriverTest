@@ -42,7 +42,7 @@ public class VertxJDBCClient {
 				if (result.getNumRows() == 1)
 					testContext.completeNow();
 				else
-					testContext.failNow("Expectefd one result.");
+					testContext.failNow("Expected one result.");
 				connection.close();
 			}));
 		}));
