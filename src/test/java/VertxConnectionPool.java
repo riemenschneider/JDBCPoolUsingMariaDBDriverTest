@@ -18,11 +18,12 @@ import io.vertx.sqlclient.Tuple;
 @ExtendWith(VertxExtension.class)
 public class VertxConnectionPool {
 	
+	static JDBCPool pool;
 	static PreparedQuery<RowSet<Row>> query;
 	
 	@BeforeAll
 	static void createPoolAndPrepareQuery(Vertx vertx) {
-		JDBCPool pool = JDBCPool.pool(vertx, new JsonObject()
+		pool = JDBCPool.pool(vertx, new JsonObject()
 				.put("driver_class", "org.mariadb.jdbc.Driver")
 				.put("url", "jdbc:mysql://ensembldb.ensembl.org:3306?autocommit=false")
 				.put("user", "anonymous")
@@ -37,6 +38,24 @@ public class VertxConnectionPool {
 	@RepeatedTest(100)
 	void executePreparedQuery(VertxTestContext testContext) throws Throwable {
 		query.execute(Tuple.of(5)).onComplete(testContext.succeedingThenComplete());
+		assertThat(testContext.awaitCompletion(2, SECONDS)).isTrue();
+		if (testContext.failed())
+			throw testContext.causeOfFailure();
+	}
+	
+	@RepeatedTest(100)
+	void getConnectionAndExecutePreparedQuery(VertxTestContext testContext) throws Throwable {
+		pool.getConnection()
+				.onComplete(testContext.succeeding(connection -> connection.preparedQuery("SELECT * FROM acanthochromis_polyacanthus_core_100_1.analysis WHERE analysis_id = ?")
+						.execute(Tuple.of(5))
+						.onFailure(e -> {
+							testContext.failNow(e);
+							connection.close();
+						})
+						.onSuccess(rows -> {
+							testContext.completeNow();
+							connection.close();
+						})));
 		assertThat(testContext.awaitCompletion(2, SECONDS)).isTrue();
 		if (testContext.failed())
 			throw testContext.causeOfFailure();
