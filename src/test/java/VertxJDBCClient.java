@@ -24,7 +24,7 @@ public class VertxJDBCClient {
 	static void createClient(Vertx vertx) throws SQLException {
 		client = JDBCClient.create(vertx, new C3P0DataSourceProvider().getDataSource(new JsonObject()
 				.put("driver_class", "org.mariadb.jdbc.Driver")
-				.put("url", "jdbc:mysql://ensembldb.ensembl.org:3306?autocommit=false")
+				.put("url", "jdbc:mysql://ensembldb.ensembl.org:3306")
 				.put("user", "anonymous")
 				.put("password", "")
 				.put("min_pool_size", 1)
