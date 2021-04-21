@@ -35,7 +35,7 @@ public class VertxConnectionPool {
 		query = pool.preparedQuery("SELECT * FROM acanthochromis_polyacanthus_core_100_1.analysis WHERE analysis_id = ?");
 	}
 	
-	@RepeatedTest(100)
+	@RepeatedTest(1000)
 	void executePreparedQuery(VertxTestContext testContext) throws Throwable {
 		query.execute(Tuple.of(5)).onComplete(testContext.succeedingThenComplete());
 		assertThat(testContext.awaitCompletion(2, SECONDS)).isTrue();
@@ -43,7 +43,7 @@ public class VertxConnectionPool {
 			throw testContext.causeOfFailure();
 	}
 	
-	@RepeatedTest(100)
+	@RepeatedTest(1000)
 	void getConnectionAndExecutePreparedQuery(VertxTestContext testContext) throws Throwable {
 		pool.getConnection()
 				.onComplete(testContext.succeeding(connection -> connection.preparedQuery("SELECT * FROM acanthochromis_polyacanthus_core_100_1.analysis WHERE analysis_id = ?")
